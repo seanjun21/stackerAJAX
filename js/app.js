@@ -1,10 +1,10 @@
 // this function takes the question object returned by the StackOverflow request
 // and returns new result to be appended to DOM
 var showQuestion = function(question) {
-	
+
 	// clone our result template code
 	var result = $('.templates .question').clone();
-	
+
 	// Set the question properties in result
 	var questionElem = result.find('.question-text a');
 	questionElem.attr('href', question.link);
@@ -49,15 +49,15 @@ var showError = function(error){
 // takes a string of semi-colon separated tags to be searched
 // for on StackOverflow
 var getUnanswered = function(tags) {
-	
+
 	// the parameters we need to pass in our request to StackOverflow's API
-	var request = { 
+	var request = {
 		tagged: tags,
 		site: 'stackoverflow',
 		order: 'desc',
 		sort: 'creation'
 	};
-	
+
 	$.ajax({
 		url: "http://api.stackexchange.com/2.2/questions/unanswered",
 		data: request,
@@ -86,10 +86,10 @@ var getUnanswered = function(tags) {
 var topAnswerers = function (tags) {
 
 	// the parameters we need to pass in our request to StackOverflow's API
-	var request = { 
+	var request = {
 		site: 'stackoverflow',
 	};
-	
+
 	$.ajax({
 		url: "http://api.stackexchange.com//2.2/tags/" + tags+ "/top-answerers/all_time",
 		data: request,
@@ -123,6 +123,8 @@ $(document).ready( function() {
 		var tags = $(this).find("input[name='tags']").val();
 		getUnanswered(tags);
 	});
+
+// Finish building function for inspiration getter
 	$('.inspiration-getter').submit( function(e){
 		e.preventDefault();
 		// zero out results if previous search has run
