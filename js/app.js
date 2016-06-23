@@ -31,13 +31,23 @@ var showQuestion = function(question) {
 };
 
 
-var showUser = function(user) {
+var showAnswerer = function(answerer) {
     //Clone hidden template
-    var result = $('.templates .user').clone();
-    //Set user properties in result
-    var userElem = result.find('.profile-pix a');
-    userElem.attr('href', user.profile_image);
-    //console.log(user, '<-- user');
+    var result = $('.templates .answerer').clone();
+
+    //Show profile picture
+    var userPicture = result.find('.profile-picture img');
+    userPicture.attr('src', answerer.user.profile_image);
+    console.log(answerer.user, '<-- answerer.user');
+
+    //Show properties about the user
+    var topUser = result.find('.answerer');
+    topUser.html('<p>Name: <a target="_blank" '+
+        'href=http://stackoverflow.com/users/' + answerer.user.user_id + ' >' +
+        answerer.user.display_name +
+        '</a></p>' +
+        '<p>Reputation: ' + answerer.user.reputation + '</p>'
+    );
     return result;
 };
 // 	var answerer = result.find('.display-name');
@@ -102,7 +112,7 @@ var getUnanswered = function(tags) {
 
 //////////////////////
 //Finish this ajax method call to implement top answeres
-var topAnswerers = function(tags) {
+var topAnswerers = function(answerers) {
 
     // the parameters we need to pass in our request to StackOverflow's API
     var request = {
@@ -110,19 +120,19 @@ var topAnswerers = function(tags) {
     };
 
     $.ajax({
-            url: "http://api.stackexchange.com/2.2/tags/" + tags + "/top-answerers/all_time",
+            url: "http://api.stackexchange.com/2.2/tags/" + answerers + "/top-answerers/all_time",
             data: request,
             dataType: "jsonp", //use jsonp to avoid cross origin issues
             type: "GET",
         })
         .done(function(result) { //this waits for the ajax to return with a succesful promise object
-            var searchResults = showSearchResults(request.tagged, result.items.length);
+            var searchResults = showSearchResults(answerers, result.items.length);
 
             $('.search-results').html(searchResults);
             //$.each is a higher order function. It takes an array and a function as an argument.
             //The function is executed once for each item in the array.
             $.each(result.items, function(i, item) {
-                var user = showUser(item);
+                var user = showAnswerer(item);
                 console.log(result.items, '<--result.item');
                 $('.results').append(user);
             });
@@ -159,10 +169,10 @@ $(document).ready(function() {
         // zero out results if previous search has run
         $('.results').html('');
         // get the value of the tags the user submitted
-        var tags = $(this).find("input[name='answers']").val();
-        //console.log(tags, '<--tags');
+        var answerers = $(this).find("input[name='answers']").val();
+        console.log(answerers, '<--tags');
         //console.log(this, '<-- this');
-        topAnswerers(tags);
+        topAnswerers(answerers);
     });
     /////////////////////////
 });
