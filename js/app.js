@@ -1,7 +1,6 @@
 // this function takes the question object returned by the StackOverflow request
 // and returns new result to be appended to DOM
 var showQuestion = function(question) {
-	
 	// clone our result template code
 	var result = $('.templates .question').clone();
 	
@@ -30,6 +29,26 @@ var showQuestion = function(question) {
 
 	return result;
 };
+
+var showAnswerers = function(answerer) {
+	// clone our result template code
+	var result = $('.templates .answerer').clone();
+
+	// Set the user image properties in result
+	var userImage = result.find('.user-image img');
+	userImage.attr('src', answerer.user.profile_image);
+
+	// set some properties related to answerer
+	var answeringUser = result.find('.answerer');
+	answeringUser.html('<p>Name: <a target="_blank" '+
+		'href=http://stackoverflow.com/users/' + answerer.user.user_id + ' >' +
+		answerer.user.display_name +
+		'</a></p>' +
+		'<p>Reputation: ' + answerer.user.reputation + '</p>'
+	);
+	return result;
+};
+
 
 
 // this function takes the results object from StackOverflow
@@ -81,29 +100,28 @@ var getUnanswered = function(tags) {
 	});
 };
 
-
-
-var topAnswerers = function (tags) {
-
+// takes a string of semi-colon separated tags to be searched
+// for on StackOverflow
+var topAnswerers = function (answerers) {
 	// the parameters we need to pass in our request to StackOverflow's API
 	var request = { 
 		site: 'stackoverflow',
 	};
 	
 	$.ajax({
-		url: "http://api.stackexchange.com//2.2/tags/" + tags+ "/top-answerers/all_time",
+		url: "http://api.stackexchange.com//2.2/tags/" + answerers+ "/top-answerers/all_time",
 		data: request,
 		dataType: "jsonp",//use jsonp to avoid cross origin issues
 		type: "GET",
 	})
 	.done(function(result){ //this waits for the ajax to return with a succesful promise object
-		var searchResults = showSearchResults(request.tagged, result.items.length);
+		var searchResults = showSearchResults(answerers, result.items.length);
 
 		$('.search-results').html(searchResults);
 		//$.each is a higher order function. It takes an array and a function as an argument.
 		//The function is executed once for each item in the array.
 		$.each(result.items, function(i, item) {
-			var question = showQuestion(item);
+			var question = showAnswerers(item);
 			$('.results').append(question);
 		});
 	})
@@ -128,7 +146,7 @@ $(document).ready( function() {
 		// zero out results if previous search has run
 		$('.results').html('');
 		// get the value of the tags the user submitted
-		var tags = $(this).find("input[name='tags']").val();
-		topAnswerers(tags);
+		var answerers = $(this).find("input[name='answerers']").val();
+		topAnswerers(answerers);
 	});
 });
